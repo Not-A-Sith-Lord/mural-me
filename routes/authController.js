@@ -5,8 +5,13 @@ const authController = express.Router();
 const User           = require("../models/user");
 
 // Bcrypt to encrypt passwords
+
 const bcrypt         = require("bcrypt");
 const bcryptSalt     = 10;
+const passport = require("passport");
+
+
+
 
 authController.get("/signup", (req, res, next) => {
   res.render("auth/signup");
@@ -44,5 +49,16 @@ authController.post("/signup", (req, res, next) => {
     });
   });
 });
+
+authController.get("/login", (req, res, next) => {
+  res.render("auth/login");
+});
+
+authController.post("/login", passport.authenticate("local", {
+  successRedirect: "/",
+  failureRedirect: "/login",
+  failureFlash: true,
+  passReqToCallback: true
+}));
 
 module.exports = authController;
