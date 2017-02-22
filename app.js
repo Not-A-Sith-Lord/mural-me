@@ -13,11 +13,12 @@ var app = express();
 const session       = require("express-session");
 const bcrypt        = require("bcrypt");
 const passport      = require("passport");
+const flash = require("connect-flash");
 const LocalStrategy = require("passport-local").Strategy;
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/passport-local");
-
+const User  = require("./models/user.js");
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -43,7 +44,10 @@ passport.deserializeUser((id, cb) => {
   });
 });
 
-passport.use(new LocalStrategy((username, password, next) => {
+app.use(flash());
+passport.use(new LocalStrategy({
+   passReqToCallback: true
+}, (req, username, password, next) => {
   User.findOne({ username }, (err, user) => {
     if (err) {
       return next(err);
