@@ -11,6 +11,11 @@ const bcryptSalt     = 10;
 const passport = require("passport");
 const ensureLogin = require("connect-ensure-login");
 
+authController.get("/auth/facebook", passport.authenticate("facebook"));
+authController.get("/auth/facebook/callback", passport.authenticate("facebook", {
+  successRedirect: "/private-page",
+  failureRedirect: "/"
+}));
 
 
 authController.get("/signup", (req, res, next) => {

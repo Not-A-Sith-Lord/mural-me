@@ -1,4 +1,4 @@
-var express = require('express');
+ovar express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -15,13 +15,22 @@ const bcrypt        = require("bcrypt");
 const passport      = require("passport");
 const flash = require("connect-flash");
 const LocalStrategy = require("passport-local").Strategy;
+const FbStrategy = require('passport-facebook').Strategy;
+const authController = require("./routes/authController");
 
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/passport-local");
+//this is how to enforce stuf before saving to db collection
+const userSchema = new Schema({
+  name: String,
+  color: String,
+  age: Number
+});
 const User  = require("./models/user.js");
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 
 //passport
 app.use(session({
@@ -29,22 +38,38 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
 //passport
+// passport.serializeUser((user, cb) => {
+//   cb(null, user.id);
+// });
+//
+// passport.deserializeUser((id, cb) => {
+//   console.log("id", id)
+//   User.findOne({ "_id": id }, (err, user) => {
+//     if (err) { return cb(err); }
+//     cb(null, user);
+//   });
+// });
+
+passport.use(new FbStrategy({
+  clientID: "...",
+  clientSecret: "...",
+  callbackURL: "http://localhost:3000/auth/facebook/callback"
+}, (accessToken, refreshToken, profile, done) => {
+  done(null, profile);
+}));
+
 passport.serializeUser((user, cb) => {
-  cb(null, user.id);
+  cb(null, user);
+});
+passport.deserializeUser((user, cb) => {
+  cb(null, user);
 });
 
-passport.deserializeUser((id, cb) => {
-  User.findOne({ "_id": id }, (err, user) => {
-    if (err) { return cb(err); }
-    cb(null, user);
-  });
-});
-
-app.use(flash());
 passport.use(new LocalStrategy({
    passReqToCallback: true
 }, (req, username, password, next) => {
@@ -72,7 +97,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const authController = require("./routes/authController");
+
 
 app.use('/', authController);
 app.use('/', index);
