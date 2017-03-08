@@ -1,14 +1,14 @@
-ovar express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+const index = require('./routes/index');
+const users = require('./routes/users');
 
-var app = express();
+const app = express();
 
 const session       = require("express-session");
 const bcrypt        = require("bcrypt");
@@ -19,13 +19,9 @@ const FbStrategy = require('passport-facebook').Strategy;
 const authController = require("./routes/authController");
 
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/passport-local");
-//this is how to enforce stuf before saving to db collection
-const userSchema = new Schema({
-  name: String,
-  color: String,
-  age: Number
-});
+mongoose.connect("mongodb://localhost/mural-me");
+//this is how to enforce stuff before saving to db collection
+
 const User  = require("./models/user.js");
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -38,22 +34,7 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }));
-app.use(flash());
-app.use(passport.initialize());
-app.use(passport.session());
 
-//passport
-// passport.serializeUser((user, cb) => {
-//   cb(null, user.id);
-// });
-//
-// passport.deserializeUser((id, cb) => {
-//   console.log("id", id)
-//   User.findOne({ "_id": id }, (err, user) => {
-//     if (err) { return cb(err); }
-//     cb(null, user);
-//   });
-// });
 
 passport.use(new FbStrategy({
   clientID: "...",
@@ -89,6 +70,12 @@ passport.use(new LocalStrategy({
 }));
 
 
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
@@ -105,7 +92,7 @@ app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });

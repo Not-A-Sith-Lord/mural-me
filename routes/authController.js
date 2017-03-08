@@ -42,7 +42,8 @@ authController.post("/signup", (req, res, next) => {
 
     var newUser = User({
       username,
-      password: hashPass
+      password: hashPass,
+    
     });
 
     newUser.save((err) => {
